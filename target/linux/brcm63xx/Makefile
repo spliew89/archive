@@ -9,8 +9,8 @@ include $(TOPDIR)/rules.mk
 ARCH:=mips
 BOARD:=brcm63xx
 BOARDNAME:=Broadcom BCM63xx
-SUBTARGETS:=generic smp
-FEATURES:=squashfs usb atm pci pcmcia usbgadget
+SUBTARGETS:=generic
+FEATURES:=squashfs low_mem
 LINUX_VERSION:=3.10.49
 MAINTAINER:=Florian Fainelli <florian@openwrt.org>
 
