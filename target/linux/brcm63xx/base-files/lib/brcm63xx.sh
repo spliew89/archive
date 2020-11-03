@@ -47,6 +47,12 @@ brcm63xx_detect() {
 		status_led="AR-5387un:green:power"
 		ifname=eth0
 		;;
+	96333AW2G)
+		ifname=eth0
+		;;
+	96333W)
+		ifname=eth0
+		;;
 	96348GW)
 		status_led="96348GW:green:power"
 		brcm63xx_has_reset_button="true"

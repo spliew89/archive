@@ -23,6 +23,13 @@ SPW500V)
 	ucidef_set_interface_lan "eth0"
 	;;
 
+96333AW2G |\
+96333W)
+	ucidef_set_interface_lan "eth0.1"
+	ucidef_add_switch "switch0" "1" "1"
+	ucidef_add_switch_vlan "switch0" "1" "0 1 2 3 4t"
+	;;
+
 96338GW |\
 96338W |\
 96338W2_E7T |\
