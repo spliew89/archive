@@ -1,0 +1,20 @@
+--- a/arch/mips/bcm63xx/dev-flash.c
++++ b/arch/mips/bcm63xx/dev-flash.c
+@@ -107,6 +107,7 @@ static int __init bcm63xx_detect_flash_type(void)
+ 		else
+ 			return BCM63XX_FLASH_TYPE_NAND;
+ 	case BCM6338_CPU_ID:
++		return BCM63XX_FLASH_TYPE_SERIAL;
+ 	case BCM6345_CPU_ID:
+ 	case BCM6348_CPU_ID:
+ 		/* no way to auto detect so assume parallel */
+@@ -235,6 +236,9 @@ int __init bcm63xx_flash_register(int num_caldata, struct bcm63xx_caldata *calda
+ 
+ 		if (BCMCPU_IS_6358() || BCMCPU_IS_6368())
+ 			bcm63xx_flash_data.max_transfer_len = SPI_6358_MSG_DATA_SIZE;
++		
++		if (BCMCPU_IS_6338())
++			bcm63xx_flash_data.max_transfer_len = 56;
+ 
+ 		return spi_register_board_info(bcm63xx_spi_flash_info,
+ 					ARRAY_SIZE(bcm63xx_spi_flash_info));

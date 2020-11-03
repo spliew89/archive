@@ -1,0 +1,42 @@
+--- a/arch/mips/bcm63xx/boards/board_bcm963xx.c
++++ b/arch/mips/bcm63xx/boards/board_bcm963xx.c
+@@ -864,6 +864,30 @@ static struct board_info __initdata board_dsl_274xb_f1 = {
+  * known 6338 boards
+  */
+ #ifdef CONFIG_BCM63XX_CPU_6338
++static struct board_info __initdata board_96333aw2g = {
++	.name				= "96333AW2G",
++	.expected_cpu_id		= 0x6338,
++
++	.has_uart0			= 1,
++	.has_enet0			= 1,
++	.enet0 = {
++		.has_phy	= 1,
++		.use_internal_phy	= 1,
++	},
++};
++
++static struct board_info __initdata board_96333w = {
++	.name				= "96333W",
++	.expected_cpu_id		= 0x6338,
++
++	.has_uart0			= 1,
++	.has_enet0			= 1,
++	.enet0 = {
++		.has_phy	= 1,
++		.use_internal_phy	= 1,
++	},
++};
++
+ static struct board_info __initdata board_96338gw = {
+ 	.name				= "96338GW",
+ 	.expected_cpu_id		= 0x6338,
+@@ -5254,6 +5278,8 @@ static const struct board_info __initconst *bcm963xx_boards[] = {
+ 	&board_FAST2704V2,
+ #endif
+ #ifdef CONFIG_BCM63XX_CPU_6338
++	&board_96333aw2g,
++	&board_96333w,
+ 	&board_96338gw,
+ 	&board_96338w,
+ 	&board_96338w2_e7t,

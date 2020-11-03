@@ -190,6 +190,8 @@ foreach my $mirror (@ARGV) {
 #push @mirrors, 'http://mirror1.openwrt.org';
 push @mirrors, 'http://mirror2.openwrt.org/sources';
 push @mirrors, 'http://downloads.openwrt.org/sources';
+push @mirrors, 'https://cdn.kernel.org/pub/linux/kernel/v3.x';
+push @mirrors, 'https://cdn.kernel.org/pub/linux/utils/util-linux/v2.24/';
 
 while (!$ok) {
 	my $mirror = shift @mirrors;

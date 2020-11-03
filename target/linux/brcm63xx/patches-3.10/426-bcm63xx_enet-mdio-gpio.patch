@@ -1,0 +1,107 @@
+--- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
++++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
+@@ -31,6 +31,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/if_vlan.h>
+ #include <linux/platform_data/b53.h>
++#include <linux/mdio-gpio.h>
+ 
+ #include <bcm63xx_dev_enet.h>
+ #include "bcm63xx_enet.h"
+@@ -1689,6 +1690,57 @@ static const struct net_device_ops bcm_enet_ops = {
+ #endif
+ };
+ 
++#define B53_PSEUDO_PHY	0x1e /* Register Access Pseudo PHY */
++
++static struct mdio_gpio_platform_data bcm6333_mdio_data = {
++	.mdc = 3,
++	.mdio = 4,
++	.phy_mask = ~(1 << B53_PSEUDO_PHY),
++};
++
++static struct platform_device bcm6333_mdio_device = {
++	.name = "mdio-gpio",
++	.id = 0,
++	.dev = {
++		.platform_data = &bcm6333_mdio_data,
++	},
++};
++
++static int dev_is_class(struct device *dev, void *class)
++{
++	if (dev->class != NULL && !strcmp(dev->class->name, class))
++		return 1;
++	
++	return 0;
++}
++
++static struct device *dev_find_class(struct device *parent, char *class)
++{
++	if (dev_is_class(parent, class)) {
++		get_device(parent);
++		return parent;
++	}
++	
++	return device_find_child(parent, class, dev_is_class);
++}
++
++static struct mii_bus *dev_to_mii_bus(struct device *dev)
++{
++	struct device *d;
++
++	d = dev_find_class(dev, "mdio_bus");
++	if (d != NULL) {
++		struct mii_bus *bus;
++
++		bus = to_mii_bus(d);
++		put_device(d);
++
++		return bus;
++	}
++
++	return NULL;
++}
++
+ /*
+  * allocate netdevice, request register memory and register device.
+  */
+@@ -1799,7 +1851,13 @@ static int bcm_enet_probe(struct platform_device *pdev)
+ 		struct phy_device *phydev;
+ 		char phy_id[MII_BUS_ID_SIZE + 3];
+ 
+-		priv->mii_bus = mdiobus_alloc();
++		priv->phy_id = B53_PSEUDO_PHY;
++		if (priv->has_phy_interrupt)
++			bcm6333_mdio_data.irqs[priv->phy_id] = priv->phy_interrupt;
++		platform_device_register(&bcm6333_mdio_device);
++		priv->mii_bus = dev_to_mii_bus(&bcm6333_mdio_device.dev);
++
++		/*priv->mii_bus = mdiobus_alloc();
+ 		if (!priv->mii_bus) {
+ 			ret = -ENOMEM;
+ 			goto out_uninit_hw;
+@@ -1811,12 +1869,12 @@ static int bcm_enet_probe(struct platform_device *pdev)
+ 		bus->priv = priv;
+ 		bus->read = bcm_enet_mdio_read_phylib;
+ 		bus->write = bcm_enet_mdio_write_phylib;
+-		sprintf(bus->id, "%s-%d", pdev->name, priv->mac_id);
++		sprintf(bus->id, "%s-%d", pdev->name, priv->mac_id);*/
+ 
+ 		/* only probe bus where we think the PHY is, because
+ 		 * the mdio read operation return 0 instead of 0xffff
+ 		 * if a slave is not present on hw */
+-		bus->phy_mask = ~(1 << priv->phy_id);
++		/*bus->phy_mask = ~(1 << priv->phy_id);
+ 
+ 		bus->irq = devm_kzalloc(&pdev->dev, sizeof(int) * PHY_MAX_ADDR,
+ 					GFP_KERNEL);
+@@ -1834,7 +1892,7 @@ static int bcm_enet_probe(struct platform_device *pdev)
+ 		if (ret) {
+ 			dev_err(&pdev->dev, "unable to register mdio bus\n");
+ 			goto out_free_mdio;
+-		}
++		}*/
+ 
+ 		/* connect to PHY */
+ 		snprintf(phy_id, sizeof(phy_id), PHY_ID_FMT,
